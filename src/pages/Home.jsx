@@ -1,9 +1,11 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
+import ChatlistCard from "../components/ChatlistCard";
 
 const Home = () => {
   const [content, setContent] = useState("");
+  const [chatlist, setChatlist] = useState([]);
 
   const onSubmitChat = async (e) => {
     try {
@@ -30,14 +32,24 @@ const Home = () => {
         }
       );
 
-      console.log(response);
+      setChatlist([
+        {
+          question: content,
+          answer: response.data.choices[0].message.content,
+        },
+        ...chatlist,
+      ]);
     } catch (error) {
       console.error(error);
     }
   };
 
+  useEffect(() => {
+    console.log(chatlist);
+  }, [chatlist]);
+
   return (
-    <div className="mt-8 flex justify-center">
+    <div className="mt-8 flex flex-col items-center">
       <form className="flex" onSubmit={onSubmitChat}>
         <input
           className="text-2xl p-2 focus:outline-none rounded-lg border-2 border-pink-200 focus:border-pink-400"
@@ -53,6 +65,11 @@ const Home = () => {
           검색
         </button>
       </form>
+      <ul className="mt-8 px-4 flex flex-col gap-4">
+        {chatlist.map((v, i) => (
+          <ChatlistCard key={i} question={v.question} answer={v.answer} />
+        ))}
+      </ul>
     </div>
   );
 };
